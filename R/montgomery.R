@@ -6,7 +6,7 @@ montgomeryDecompostion <- function(.l, .decFormula){
   stopifnot(!(purrr::is_null(names(.l))))
 
   if(stringr::str_detect(.decFormula, "\\+|\\(|\\)|\\-|\\[")){
-    stop("These operators are not yet supported in this package")
+    stop("These operators are not supported in this package")
   }
 
   .dismantledDec <- .decFormula %>%
@@ -50,23 +50,41 @@ montgomeryDecompostion <- function(.l, .decFormula){
     all() %>%
     `!` %>%
     if(.)  stop("The dimensions of the variables in .l are incompatible with the decomposition.")
-  #  purrr::map(~ .x[c(1, length(.x))]) #%>%
-  #  innermap(~ .x[2]==.y[1])
+
+ fList <- .dismantledDec$Operators
+ fList[fList == "%*%"] <- "mmatrix_expansion"
+ fList[fList == "*"] <- "hmatrix_expansion"
+
+ fListNum <- fList
+ fListNum[fListNum == "mmatrix_expansion"] <- "1"
+ fListNum[fListNum == "hmatrix_expansion"] <- "0"
+ fListNum <- fListNum %>%
+   as.numeric()
 
 
+ RankIndex <- map(1:2, append, fListNum) %>%
+   map(accumulate, `+`) %>%
+   transpose() %>%
+   map(flatten_dbl)
+
+ simplifyInDepth <- function(x) map_depth(x, -2, simplify2array)
 
   yearOutput <- .dismantledDec$Variables %>%
     purrr::map(~ .l[[.x]]) %>%
     setNames(.dismantledDec$Variables) %>%
     purrr::transpose() %>% # Supondo tudo como %*% nesse momento
-    map(reduce, mmatrix_expansion)
+    map(reduce2, fList,
+        function(x1,x2,f0) rlang::exec(.fn = f0, x1, x2))
 
-  return(yearOutput)
+ yearOutput %>% vec_depth() %>% `:`(1)
+
+
 }
 
 listA <- list("A" = list("t0" = matrix(runif(6), ncol=3), "t1" = matrix(runif(6), ncol=3)),
               "B" = list("t0" = matrix(runif(27), nrow=3), "t1" = matrix(runif(27), nrow=3)),
-              "C" = list("t0" = matrix(runif(9), nrow=3), "t1" = matrix(runif(9), nrow=3)))
+              "C" = list("t0" = matrix(runif(9), nrow=3), "t1" = matrix(runif(9), nrow=3)),
+              "D" = list("t0" = matrix(runif(27), nrow =3), "t1"= matrix(runif(27), nrow=3)))
 
 
 listA %>% montgomeryDecompostion("A%*%C%*%B")
@@ -74,7 +92,8 @@ listA %>% montgomeryDecompostion("A%*%C%*%B")
 testeA <- listA %>%
   montgomeryDecompostion("A%*%C%*%B")
 
-
+testeA0 <- listA %>%
+  montgomeryDecompostion("A%*%C")
 
 listB <- list("A" =  matrix(runif(6), ncol=3),
               "C" =  matrix(runif(9), nrow=3))
@@ -90,4 +109,9 @@ listC <- list("A" = list("t0" = matrix(runif(6), ncol=3), "t1" = matrix(runif(6)
               "B" = list("t0" = matrix(runif(27), nrow=3), "t1" = matrix(runif(27), nrow=3))) %>%
   purrr::map(`[[`, "t0")
 
-reduce(listC)
+reduce(listC, mmatrix_expansion)
+
+listD <- listC %>%
+  reduce(mmatrix_expansion) %>%
+  list(.) %>%
+  append(list(matrix(runif(27), ncol =9)))

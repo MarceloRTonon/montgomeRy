@@ -1,3 +1,4 @@
+# Matrix multiplicatin expansion
 mmatrix_expansion <- function(x,y){
 
   if(is.null(dim(x)) | (length(dim(x)) ==1)){
