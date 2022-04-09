@@ -32,4 +32,5 @@ mmatrix_expansion <- function(x,y){
                                           function(l) aperm(a= simplify2array(l),
                                                             perm=y)))
 
+  return(output.l)
 }

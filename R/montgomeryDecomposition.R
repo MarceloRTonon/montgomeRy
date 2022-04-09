@@ -62,23 +62,62 @@ montgomeryDecompostion <- function(.l, .decFormula){
    as.numeric()
 
 
- RankIndex <- map(1:2, append, fListNum) %>%
+ rankIndex <- map(1:2, append, fListNum) %>%
    map(accumulate, `+`) %>%
    transpose() %>%
-   map(flatten_dbl)
+   map(flatten_dbl) %>%
+   setNames(.dismantledDec$Variables)
+
+ min2maxRank <- c(min(unlist(rankIndex)):max(unlist(rankIndex)))
+
+ revRankIndex <- rankIndex %>%
+   map(~ (min2maxRank %in% .x)) %>%
+   map(~min2maxRank[!.x])
+
 
  simplifyInDepth <- function(x) map_depth(x, -2, simplify2array)
 
-  yearOutput <- .dismantledDec$Variables %>%
-    purrr::map(~ .l[[.x]]) %>%
-    setNames(.dismantledDec$Variables) %>%
-    purrr::transpose() %>% # Supondo tudo como %*% nesse momento
-    map(reduce2, fList,
-        function(x1,x2,f0) rlang::exec(.fn = f0, x1, x2))
+ if(all(fListNum==1)){
+   yearOutput <-.dismantledDec$Variables %>%
+     purrr::map(~ .l[[.x]]) %>%
+     setNames(.dismantledDec$Variables) %>%
+     purrr::transpose() %>% # Supondo tudo como %*% nesse momento
+     map(reduce2, fList,
+         function(x1,x2,f0) rlang::exec(.fn = f0, x1, x2))
 
- yearOutput %>% vec_depth() %>% `:`(1)
+
+ }
+
+  logMeanedOutput <- yearOutput %>%
+    reduce(logMean)
+
+  logMeaned_treed_byVars <- revRankIndex %>%
+    map(function(index) purrr::array_tree(logMeanedOutput, margin = index)) %>%
+    setNames(.dismantledDec$Variables)
+
+ lnVars <- .dismantledDec$Variables %>%
+  purrr::map(~ .l[[.x]]) %>%
+   setNames(.dismantledDec$Variables) %>%
+   map(reduce, logDiv)
 
 
+ MontDecRaw <- lnVars %>%
+   map2(logMeaned_treed_byVars,
+        function(x,y) map_depth(y, .depth = -1, `*`, x))
+
+ # Falta criar agora uma versão que devolve o MontDec somado para cada varíavel (agregadão), bem como o montDec para cada valor do produto (sem estar expandido)
+
+ # lista para ir testando
+  list(logMeanedOutput = logMeanedOutput,
+       yearOutput = yearOutput,
+       rankIndex = rankIndex,
+       VarsDim = VarsDim,
+       decVars = .dismantledDec$Variables,
+        revRankIndex = revRankIndex,
+        logMeaned_treed_byVars = logMeaned_treed_byVars,
+       lnVars = lnVars,
+       MontDecRaw= MontDecRaw
+       )
 }
 
 listA <- list("A" = list("t0" = matrix(runif(6), ncol=3), "t1" = matrix(runif(6), ncol=3)),
@@ -86,13 +125,11 @@ listA <- list("A" = list("t0" = matrix(runif(6), ncol=3), "t1" = matrix(runif(6)
               "C" = list("t0" = matrix(runif(9), nrow=3), "t1" = matrix(runif(9), nrow=3)),
               "D" = list("t0" = matrix(runif(27), nrow =3), "t1"= matrix(runif(27), nrow=3)))
 
-
-listA %>% montgomeryDecompostion("A%*%C%*%B")
-
-testeA <- listA %>%
+# testA = yearOutput arrays must have the dims of c(2,3,3,9)
+testA0 <- listA %>%
   montgomeryDecompostion("A%*%C%*%B")
 
-testeA0 <- listA %>%
+testA1 <- listA %>%
   montgomeryDecompostion("A%*%C")
 
 listB <- list("A" =  matrix(runif(6), ncol=3),
