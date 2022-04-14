@@ -1,11 +1,26 @@
 # Matrix Hadamard Multiplication  Expansion
+#' Title
+#'
+#' @param x
+#' @param y
+#'
+#' @return
+#' @export
+#' @importFrom purrr some
+#' @importFrom rlang is_scalar_double
+#' @importFrom rlang is_scalar_integer
+#' @importFrom purrr every
+#' @importFrom purrr when
+#' @importFrom purrr map_at
+#' @importFrom purrr compose
+#' @examples
 hmatrix_expansion <- function(x,y){
 
   isScalar <- list(x,y) %>%
-    purrr::when(purrr::some(.,
-                            rlang::is_scalar_double) ~ TRUE,
-                purrr::some(.,
-                             rlang::is_scalar_integer) ~ TRUE) %>%
+    when(some(.,
+                            is_scalar_double) ~ TRUE,
+                some(.,
+                             is_scalar_integer) ~ TRUE) %>%
     is.null() %>%
     `!`
 
@@ -25,14 +40,14 @@ hmatrix_expansion <- function(x,y){
   dim_y <- dim(y)
 
   dimComTest <- list(dim_x, dim_y) %>%
-    purrr::map(rev) %>%
-    purrr::map_at(.at =1, `[`, 1:length(dim_y)) %>%
-    purrr::reduce(`==`) %>%
+    map(rev) %>%
+    map_at(.at =1, `[`, 1:length(dim_y)) %>%
+    reduce(`==`) %>%
     all()
 
   if(!dimComTest) stop("The x and y do not have compatible dimensions.")
   difMarg <- list(dim_x, dim_y) %>%
-    purrr::map(length) %>%
+    map(length) %>%
     reduce(`-`)
 
   if(difMarg <0 ) stop("y has higher margin than x.")
@@ -41,14 +56,14 @@ hmatrix_expansion <- function(x,y){
   PermOrder <- difMarg %>%
    `+`(1) %>%
     `:`(length(dim_x)) %>%
-    purrr::map(function(x) c(x, 1:(x-1)))
+    map(function(x) c(x, 1:(x-1)))
 
   x %>%
-    purrr::array_tree(margin = 1:difMarg) %>%
-    purrr::map_depth(-1, `*`, y) %>%
+    array_tree(margin = 1:difMarg) %>%
+    map_depth(-1, `*`, y) %>%
     list(.) %>%
     append(PermOrder) %>%
-    purrr::reduce(function(x,y) map_depth(x,
+    reduce(function(x,y) map_depth(x,
                                           .depth = -2,
                                           function(l) aperm(a= simplify2array(l),
                                                             perm=y)))

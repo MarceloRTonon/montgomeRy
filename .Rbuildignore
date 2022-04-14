@@ -2,3 +2,5 @@
 ^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+R/exemplo.R
+R/setup_source.R

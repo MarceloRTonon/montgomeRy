@@ -10,7 +10,12 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    htmltools,
+    magrittr,
+    htmltools, 
+    stats,
     purrr,
-    rlang,
+    stringr,
+    rlang
+Depends:
     stringr
+RoxygenNote: 7.1.2
