@@ -1,3 +1,12 @@
+#' Title
+#'
+#' @param x
+#' @param y
+#'
+#' @return
+#' @export
+#'
+#' @examples
 logMean <- function(x,y){
 
   stopifnot(!any(x>0 & y<0),

@@ -3,6 +3,8 @@
 export(hmatrix_expansion)
 export(innermap)
 export(innermap_lgl)
+export(logDiv)
+export(logMean)
 export(mmatrix_expansion)
 export(montgomeryDecompostion)
 importFrom(magrittr,"%>%")

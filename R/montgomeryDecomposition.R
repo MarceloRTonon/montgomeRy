@@ -1,10 +1,9 @@
-#' Title
+#' Montgomery Decomposition for Input-Output model
 #'
-#' @param .l A list with the variables that create the variable
+#' @param .l A list with the variables from the equation to be decomposed.
 #' @param .decFormula A string that contains
-#' @param .output The desired display form of the decomposition results
-#'
-#' @return
+#' @param .output The desired display form of the decomposition results. Must be a character. See details for more information
+#' @return The output of the function depends on the
 #' @importFrom magrittr %>%
 #' @importFrom purrr map
 #' @importFrom purrr map_at
@@ -31,6 +30,27 @@
 #' @importFrom stringr str_replace_all
 #' @export
 #'
+#' @description TO INCLUDE. A description of the Montgomery Decomposition
+#'
+#' @details TO INCLUDE. The details of how the function works.
+#'
+#'
+#'
+#' @return
+#'
+#' The function output value will vary accordingly to the .output parameter.
+#'
+#'  * If .output parameter is "default" or, for shortcut, "D", the function will return a list with the contributions of each variable in a matrices with dimensions of the model output.
+#'
+#'  * If .output parameter is "aggregated" or, for shortcut, "Agg", the function will return a list with the aggregated value for each variable.
+#'
+#'  * If .output parameter is "vars" or, for shortcut, "V", the function will return a list with the contribution of each variable in the matrices in their dimensions.
+#'
+#'  * If .output parameter is "raw" or, for shortcut, "R", the funciton will return list with the contribuitions of each variable in an array with all the margins.
+#'
+#'  * If .output parameter is "all" or, for shortcut, "A", the function will return a list containg all of the cases above.
+#'
+#'  If the .output parameter is not given it will be set to "default". If one is given, but is it is none of the above, a warning will be displayed and the .output will be set to "all".
 #' @examples
 #' lofVars <- list("A" = list("t0" = matrix(runif(8), ncol=4), "t1" = matrix(runif(8), ncol=4)),
 #'                 "C" = list("t0" = matrix(runif(27), nrow=3), "t1" = matrix(runif(27), nrow=3)),

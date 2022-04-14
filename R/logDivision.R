@@ -1,5 +1,14 @@
 # The function that returns the montgomery decomposition
 
+#' Title
+#'
+#' @param x
+#' @param y
+#'
+#' @return
+#' @export
+#'
+#' @examples
 logDiv <- function(x,y ){
   stopifnot(!any(x>0 & y<0),
             !any(x<0 & y>0)) # x and y must have the same sign!
