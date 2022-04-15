@@ -62,7 +62,7 @@
 #' lofVars %>% montgomeryDecomposition("A%*%B%*%C*D", "all")
 #'
 #'
-montgomeryDecompostion <- function(.l, .decFormula, .output = "default"){
+montgomeryDecomposition <- function(.l, .decFormula, .output = "default"){
 
   if(length(.output)>1){
     stop("The .output. argument cannot have a length higher than 1!")
