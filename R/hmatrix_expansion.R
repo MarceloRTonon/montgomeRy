@@ -39,12 +39,8 @@ hmatrix_expansion <- function(x,y){
   dim_x <- dim(x)
   dim_y <- dim(y)
 
-  dimComTest <- list(dim_x, dim_y) %>%
-    map(rev) %>%
-    map_at(.at =1, `[`, 1:length(dim_y)) %>%
-    reduce(`==`) %>%
-    all()
-
+  dimComTest <- dim_x[2] == dim_x[1]
+  
   if(!dimComTest) stop("The x and y do not have compatible dimensions.")
   difMarg <- list(dim_x, dim_y) %>%
     map(length) %>%
