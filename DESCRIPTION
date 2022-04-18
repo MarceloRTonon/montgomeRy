@@ -2,7 +2,7 @@ Package: montgomeRy
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.1
-Author: Marcelo R. Tonon
+Author: Marcelo R. Tonon and Gabriel Zaffari
 Maintainer: Marcelo R. Tonon <marcelo.resende.tonon@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
