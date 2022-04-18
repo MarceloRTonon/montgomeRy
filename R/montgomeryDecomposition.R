@@ -79,7 +79,9 @@ montgomeryDecomposition <- function(.l, .decFormula, .output = "default"){
     warning('.output not valid! \n Changing the value to "all". \n Check the documentation to more information.')
   }
   # The structure of .l must be first the variables, then time: list$vars$time
-  stopifnot(!(is.null(names(.l))))
+  if(is.null(names(.l))){
+    stop(".l must have names!")
+    }
 
   if(stringr::str_detect(.decFormula, "\\+|\\(|\\)|\\-|\\[")){
     stop("These operators are not supported in this package")
